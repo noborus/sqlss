@@ -38,7 +38,8 @@ func SplitQueries(sql string) []string {
 			}
 			currentQuery.WriteRune(r)
 		case '-':
-			if i < len(sql)-1 && sql[i+1] == '-' {
+			if i < len(sql)-1 && sql[i+1] == '-' && !inSingle && !inDouble && !inBack && !escaped && !inComment2 {
+				skip = true
 				inComment = true
 			}
 			currentQuery.WriteRune(r)
