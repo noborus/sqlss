@@ -1,13 +1,3 @@
-# sqlss
-
-Split SQL into statements.
-
-Do not split within single quotes, double quotes, or back quotes.
-It also doesn't break at semicolons in comments.
-
-## Usage
-
-```go
 package main
 
 import (
@@ -22,4 +12,3 @@ func main() {
 		fmt.Println(query)
 	}
 }
-```
