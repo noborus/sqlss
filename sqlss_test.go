@@ -79,6 +79,16 @@ func TestSplitQueries(t *testing.T) {
 				"SELECT * FROM users WHERE name = 'John;Doe'",
 			},
 		},
+		{
+			name: "testComment3",
+			args: args{
+				sql: "SELECT /* -- */ 'a';SELECT 'b'",
+			},
+			want: []string{
+				"SELECT /* -- */ 'a'",
+				"SELECT 'b'",
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
