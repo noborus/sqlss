@@ -5,13 +5,74 @@ import (
 )
 
 // SplitQueries splits a string of semicolon-separated SQL queries into individual queries.
+// It does not split semicolons that are within single quotes, double quotes, back quotes or escaped by two single quotes.
 func SplitQueries(sql string) []string {
-	// Split the string on semicolons
-	queries := strings.Split(sql, ";")
+	var queries []string
+	var currentQuery strings.Builder
+	inSingle, inDouble, inBack, escaped, inComment, inComment2 := false, false, false, false, false, false
+	skip := false
 
-	// Trim whitespace from each query
-	for i, query := range queries {
-		queries[i] = strings.TrimSpace(query)
+	for i, r := range sql {
+		if skip {
+			skip = false
+			currentQuery.WriteRune(r)
+			continue
+		}
+		switch r {
+		case '\'':
+			if i < len(sql)-1 && sql[i+1] == '\'' {
+				skip = true
+				escaped = !escaped
+			} else {
+				inSingle = !inSingle
+			}
+			currentQuery.WriteRune(r)
+		case '"':
+			if !escaped {
+				inDouble = !inDouble
+			}
+			currentQuery.WriteRune(r)
+		case '`':
+			if !escaped {
+				inBack = !inBack
+			}
+			currentQuery.WriteRune(r)
+		case '-':
+			if i < len(sql)-1 && sql[i+1] == '-' {
+				inComment = true
+			}
+			currentQuery.WriteRune(r)
+		case '\n':
+			inComment = false
+			currentQuery.WriteRune(r)
+		case '/':
+			if i < len(sql)-1 && sql[i+1] == '*' {
+				inComment2 = true
+			}
+			currentQuery.WriteRune(r)
+		case '*':
+			if i < len(sql)-1 && sql[i+1] == '/' {
+				inComment2 = false
+			}
+			currentQuery.WriteRune(r)
+		case ';':
+			if inSingle || inDouble || inBack || escaped || inComment || inComment2 {
+				currentQuery.WriteRune(r)
+			} else {
+				queries = append(queries, strings.TrimSpace(currentQuery.String()))
+				currentQuery.Reset()
+			}
+			escaped = false
+		default:
+			escaped = false
+			currentQuery.WriteRune(r)
+		}
+	}
+
+	// Add the last query if it's not empty
+	lastQuery := strings.TrimSpace(currentQuery.String())
+	if lastQuery != "" {
+		queries = append(queries, lastQuery)
 	}
 
 	return queries

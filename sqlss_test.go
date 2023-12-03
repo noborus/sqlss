@@ -15,13 +15,68 @@ func TestSplitQueries(t *testing.T) {
 		want []string
 	}{
 		{
-			name: "SplitQueries",
+			name: "TestEmpty",
+			args: args{
+				sql: "",
+			},
+			want: []string{},
+		},
+		{
+			name: "TestNormal",
 			args: args{
 				sql: "SELECT * FROM users; SELECT * FROM posts;",
 			},
 			want: []string{
 				"SELECT * FROM users",
 				"SELECT * FROM posts",
+			},
+		},
+		{
+			name: "testEscapedSemicolon",
+			args: args{
+				sql: "SELECT * FROM users WHERE name = 'John;Doe'; SELECT * FROM posts;",
+			},
+			want: []string{
+				"SELECT * FROM users WHERE name = 'John;Doe'",
+				"SELECT * FROM posts",
+			},
+		},
+		{
+			name: "testEscapedSemicolon2",
+			args: args{
+				sql: "SELECT * FROM users WHERE name = 'John''Doe'; SELECT * FROM posts;",
+			},
+			want: []string{
+				"SELECT * FROM users WHERE name = 'John''Doe'",
+				"SELECT * FROM posts",
+			},
+		},
+		{
+			name: "testEscapedSemicolon3",
+			args: args{
+				sql: "SELECT * FROM users WHERE name = 'John'';''Doe'; SELECT * FROM posts;",
+			},
+			want: []string{
+				"SELECT * FROM users WHERE name = 'John'';''Doe'",
+				"SELECT * FROM posts",
+			},
+		},
+		{
+			name: "testComment1",
+			args: args{
+				sql: "SELECT * FROM users WHERE name = 'John;Doe'; -- SELECT * FROM posts;",
+			},
+			want: []string{
+				"SELECT * FROM users WHERE name = 'John;Doe'",
+			},
+		},
+		{
+			name: "testComment2",
+			args: args{
+				sql: "SELECT * FROM users WHERE name = 'John;Doe'; /* SELECT * FROM posts; */",
+			},
+			want: []string{
+				"SELECT * FROM users WHERE name = 'John;Doe'",
 			},
 		},
 	}
