@@ -18,9 +18,13 @@ func SplitQueries(sql string) []string {
 			currentQuery.WriteRune(r)
 			continue
 		}
+		var next byte
+		if i < len(sql)-1 {
+			next = sql[i+1]
+		}
 		switch r {
 		case '\'':
-			if i < len(sql)-1 && sql[i+1] == '\'' {
+			if next == '\'' {
 				skip = true
 				escaped = !escaped
 			} else {
@@ -38,7 +42,7 @@ func SplitQueries(sql string) []string {
 			}
 			currentQuery.WriteRune(r)
 		case '-':
-			if i < len(sql)-1 && sql[i+1] == '-' && !inSingle && !inDouble && !inBack && !escaped && !inComment2 {
+			if next == '-' && !inSingle && !inDouble && !inBack && !escaped && !inComment2 {
 				skip = true
 				inComment = true
 			}
@@ -47,12 +51,14 @@ func SplitQueries(sql string) []string {
 			inComment = false
 			currentQuery.WriteRune(r)
 		case '/':
-			if i < len(sql)-1 && sql[i+1] == '*' {
+			if next == '*' {
+				skip = true
 				inComment2 = true
 			}
 			currentQuery.WriteRune(r)
 		case '*':
-			if i < len(sql)-1 && sql[i+1] == '/' {
+			if next == '/' {
+				skip = true
 				inComment2 = false
 			}
 			currentQuery.WriteRune(r)
