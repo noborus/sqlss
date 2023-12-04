@@ -24,7 +24,7 @@ func SplitQueries(sql string) []string {
 		}
 		switch r {
 		case '\'':
-			if next == '\'' {
+			if inSingle && next == '\'' {
 				skip = true
 				escaped = !escaped
 			} else {
