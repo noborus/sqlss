@@ -62,6 +62,16 @@ func TestSplitQueries(t *testing.T) {
 			},
 		},
 		{
+			name: "TestEscapedSemicolon4",
+			args: args{
+				sql: "SELECT * FROM users WHERE name = 'JohnDoe'/*; SELECT * FROM posts*/; SELECT * FROM posts;",
+			},
+			want: []string{
+				"SELECT * FROM users WHERE name = 'JohnDoe'/*; SELECT * FROM posts*/",
+				"SELECT * FROM posts",
+			},
+		},
+		{
 			name: "testComment1",
 			args: args{
 				sql: "SELECT * FROM users WHERE name = 'John;Doe'; -- SELECT * FROM posts;",
