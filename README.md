@@ -1,5 +1,7 @@
 # sqlss
 
+[![PkgGoDev](https://pkg.go.dev/badge/github.com/noborus/sqlss)](https://pkg.go.dev/github.com/noborus/sqlss)
+
 Split SQL into statements.
 
 Do not split within single quotes, double quotes, or back quotes.
@@ -22,4 +24,8 @@ func main() {
 		fmt.Println(query)
 	}
 }
+
+// Output:
+// SELECT * FROM table1
+// SELECT * FROM table2
 ```
