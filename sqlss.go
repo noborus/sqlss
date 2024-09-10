@@ -6,21 +6,21 @@ import (
 
 // SplitQueries splits a string of semicolon-separated SQL queries into individual queries.
 // It does not split semicolons that are within single quotes, double quotes, back quotes or escaped by two single quotes.
-func SplitQueries(sql string) []string {
+func SplitQueries(sqlQuery string) []string {
 	var queries []string
 	var currentQuery strings.Builder
 	inSingle, inDouble, inBack, escaped, inComment, inComment2 := false, false, false, false, false, false
 	skip := false
 
-	for i, r := range sql {
+	for i, r := range sqlQuery {
 		if skip {
 			skip = false
 			currentQuery.WriteRune(r)
 			continue
 		}
 		var next byte
-		if i < len(sql)-1 {
-			next = sql[i+1]
+		if i < len(sqlQuery)-1 {
+			next = sqlQuery[i+1]
 		}
 		switch r {
 		case '\'':
