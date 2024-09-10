@@ -15,5 +15,4 @@ func main() {
 	for _, query := range queries {
 		fmt.Println(query)
 	}
-
 }
